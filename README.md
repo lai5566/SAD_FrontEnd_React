@@ -64,7 +64,7 @@ das_FrontEnd_React/
 # 🛠️ 安裝與執行
 ### 1.克隆專案
 ```
-git clone https://github.com/lai5566/das_FrontEnd_React.git
+git clone https://github.com/lai5566/SAD_FrontEnd_React.git
 cd das_FrontEnd_React
 ```
 ### 2.安裝依賴
