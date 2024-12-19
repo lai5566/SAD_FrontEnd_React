@@ -15,11 +15,11 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import  TinyBarChart  from './bar';
 import {Portrait} from "@mui/icons-material";
 import ProtectedRoute from "./ProtectedRoute";
-import ResetPassword from "./sign-in/ResetPassword";
 const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
 import ScheduleTable  from "./pages/SchedulePage";
 import CourseProvider from './dataLayer/CourseProvider'; // 從資料層導入CourseProvider
+import ResetPassword from "./sign-in/ResetPassword";
 root.render(
     <React.StrictMode>
         <ThemeProvider theme={theme}>
@@ -28,6 +28,7 @@ root.render(
                     <Route path="/" element={<SignIn/>}/>
                     <Route path="/signup" element={<SignUp/>}/>
                     <Route path="/c" element={<CourseDataGrid/>}/>
+                    <Route path="/reset-password" element={<ResetPassword/>} />
                     {/*<Route path="/Table" element={<EmptyScheduleTable/>}/>*/}
                     {/*<Route path="/grid" element={<EmptyScheduleGrid/>}/>*/}
                     {/*<Route path="/table2" element={<DragSelectScheduleWithMenu/>}/>*/}

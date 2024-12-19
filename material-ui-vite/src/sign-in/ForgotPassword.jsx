@@ -1,4 +1,4 @@
-// ForgotPassword.jsx
+// src/ForgotPassword.jsx
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -12,7 +12,7 @@ import {
     Button,
     Alert,
 } from '@mui/material';
-import axios from 'axios';
+import api from '../api/axiosInstance'; // 引入自訂的 Axios 實例
 
 const ForgotPassword = ({ open, handleClose }) => {
     const [email, setEmail] = useState('');
@@ -27,12 +27,19 @@ const ForgotPassword = ({ open, handleClose }) => {
         setError(null);
 
         try {
-            const response = await axios.post('/sc/api/password_reset/', { email });
+            const response = await api.post('/sc/api/password_reset/', { email });
             setMessage(response.data.message);
             setEmail('');
         } catch (err) {
             if (err.response && err.response.data) {
-                setError(err.response.data.email || '發生錯誤，請稍後再試。');
+                // 由後端返回的錯誤訊息
+                if (err.response.data.email) {
+                    setError(err.response.data.email);
+                } else if (err.response.data.message) {
+                    setError(err.response.data.message);
+                } else {
+                    setError('發生錯誤，請稍後再試。');
+                }
             } else {
                 setError('發生錯誤，請稍後再試。');
             }
