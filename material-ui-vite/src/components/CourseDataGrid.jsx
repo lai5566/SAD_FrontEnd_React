@@ -1,5 +1,6 @@
-import React, {useState, useMemo, useEffect} from 'react';
-import {DataGrid} from '@mui/x-data-grid';
+// CourseDataGrid.jsx
+import React, { useState, useMemo, useEffect } from 'react';
+import { DataGrid } from '@mui/x-data-grid';
 import {
     Button,
     Box,
@@ -10,12 +11,63 @@ import {
     FormGroup,
     FormControlLabel,
     Checkbox,
-    Divider
+    Divider,
+    styled,
+    Toolbar,
+    IconButton,
+    Tooltip,
 } from '@mui/material';
-import {useCourseData} from '../dataLayer/useCourseData';
+import AddIcon from '@mui/icons-material/Add'; // 引入 AddIcon
+import { useCourseData } from '../dataLayer/useCourseData';
+
+// 自定義工具列組件
+const CustomToolbar = ({ selectedCount, onAddCourses }) => {
+    return (
+        <Toolbar
+            sx={{
+                pl: { sm: 2 },
+                pr: { xs: 1, sm: 1 },
+                ...(selectedCount > 0 && {
+                    bgcolor: (theme) =>
+                        theme.palette.mode === 'light'
+                            ? theme.palette.primary.light
+                            : theme.palette.primary.dark,
+                }),
+            }}
+        >
+            {selectedCount > 0 ? (
+                <Typography
+                    sx={{ flex: '1 1 100%' }}
+                    color="inherit"
+                    variant="subtitle1"
+                    component="div"
+                >
+                    {selectedCount} 選擇中
+                </Typography>
+            ) : (
+                <Typography
+                    sx={{ flex: '1 1 100%' }}
+                    variant="h6"
+                    id="tableTitle"
+                    component="div"
+                >
+                    課程資料
+                </Typography>
+            )}
+
+            {selectedCount > 0 && (
+                <Tooltip title="加選">
+                    <IconButton onClick={onAddCourses}>
+                        <AddIcon />
+                    </IconButton>
+                </Tooltip>
+            )}
+        </Toolbar>
+    );
+};
 
 function CourseDataGrid() {
-    const {allCourses, addCourses} = useCourseData();
+    const { allCourses, addCourses } = useCourseData();
 
     // 在資料載入後檢查資料是否有 id 欄位
     useEffect(() => {
@@ -63,28 +115,29 @@ function CourseDataGrid() {
     };
 
     const columns = [
-        {field: 'course_class', headerName: '課程名稱', width: 200},
-        {field: 'course_type', headerName: '課別名稱', width: 150},
-        {field: 'instructor_name', headerName: '授課教師', width: 150},
-        {field: 'credits', headerName: '學分數', width: 100},
-        {field: 'weekday', headerName: '上課星期', width: 100},
-        {field: 'class_period', headerName: '上課節次', width: 100},
-        {field: 'grade', headerName: '年級', width: 100},
+        { field: 'course_class', headerName: '課程名稱', width: 200 },
+        { field: 'course_type', headerName: '課別名稱', width: 150 },
+        { field: 'instructor_name', headerName: '授課教師', width: 150 },
+        { field: 'credits', headerName: '學分數', width: 100 },
+        { field: 'weekday', headerName: '上課星期', width: 100 },
+        { field: 'class_period', headerName: '上課節次', width: 100 },
+        { field: 'grade', headerName: '年級', width: 100 },
     ];
 
     return (
-        <Paper elevation={3} sx={{p: 3, maxWidth: 1400, mx: 'auto', mt: 5}}>
+        <Paper elevation={3} sx={{ p: 3, maxWidth: 1400, mx: 'auto', mt: 5 }}>
             <Box display="flex" gap={3}>
                 {/* 課程表格區 */}
                 <Box flex={3}>
-                    <Box sx={{height: 600, width: '100%', mb: 2}}>
+                    {/* 自定義工具列 */}
+                    <CustomToolbar selectedCount={selectedIds.length} onAddCourses={handleAddCourses} />
+
+                    <Box sx={{ height: 600, width: '100%', mb: 2 }}>
                         <DataGrid
                             rows={filteredRows}
                             columns={columns}
                             checkboxSelection
                             disableRowSelectionOnClick
-                            // 舊版寫法（錯誤）：selectionModel={selectedIds} onSelectionModelChange={...}
-                            // 新版正確寫法：
                             rowSelectionModel={selectedIds}
                             onRowSelectionModelChange={(newSelection) => {
                                 console.log("New selection:", newSelection);
@@ -92,22 +145,10 @@ function CourseDataGrid() {
                             }}
                         />
                     </Box>
-                    {/* 表格下方的加選按鈕 */}
-                    <Box display="flex" justifyContent="flex-end" sx={{mt: 2}}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            disabled={selectedIds.length === 0}
-                            // 如果勾選行成功，selectedIds.length > 0，按鈕變可按
-                            onClick={handleAddCourses}
-                        >
-                            加選
-                        </Button>
-                    </Box>
                 </Box>
                 {/* 查詢工具區 */}
                 <Box flex={1}>
-                    <Paper elevation={3} sx={{p: 2}}>
+                    <Paper elevation={3} sx={{ p: 2 }}>
                         <Typography variant="h6" gutterBottom>
                             查詢工具
                         </Typography>
@@ -117,8 +158,8 @@ function CourseDataGrid() {
                                 options={uniqueInstructors}
                                 value={selectedInstructor}
                                 onChange={(event, newValue) => setSelectedInstructor(newValue)}
-                                renderInput={(params) => <TextField {...params} label="選擇老師"/>}
-                                sx={{width: '100%'}}
+                                renderInput={(params) => <TextField {...params} label="選擇老師" />}
+                                sx={{ width: '100%' }}
                                 clearOnEscape
                             />
                             <Autocomplete
@@ -126,11 +167,11 @@ function CourseDataGrid() {
                                 options={uniqueCourseNames}
                                 value={selectedCourseName}
                                 onChange={(event, newValue) => setSelectedCourseName(newValue)}
-                                renderInput={(params) => <TextField {...params} label="選擇課程名稱"/>}
-                                sx={{width: '100%'}}
+                                renderInput={(params) => <TextField {...params} label="選擇課程名稱" />}
+                                sx={{ width: '100%' }}
                                 clearOnEscape
                             />
-                            <Divider/>
+                            <Divider />
                             <Box>
                                 <Typography variant="subtitle1" gutterBottom>年級</Typography>
                                 <FormGroup>
@@ -151,28 +192,7 @@ function CourseDataGrid() {
                                     ))}
                                 </FormGroup>
                             </Box>
-                            <Divider/>
-                            {/*<Box>*/}
-                            {/*    <Typography variant="subtitle1" gutterBottom>課程組別</Typography>*/}
-                            {/*    <FormGroup>*/}
-                            {/*        {uniqueCourseGroups.map((group) => (*/}
-                            {/*            <FormControlLabel*/}
-                            {/*                key={group}*/}
-                            {/*                control={*/}
-                            {/*                    <Checkbox*/}
-                            {/*                        checked={selectedCourseGroups.includes(group)}*/}
-                            {/*                        onChange={(event) => {*/}
-                            {/*                            if (event.target.checked) setSelectedCourseGroups(prev => [...prev, group]);*/}
-                            {/*                            else setSelectedCourseGroups(prev => prev.filter(g => g !== group));*/}
-                            {/*                        }}*/}
-                            {/*                    />*/}
-                            {/*                }*/}
-                            {/*                label={`組別 ${group}`}*/}
-                            {/*            />*/}
-                            {/*        ))}*/}
-                            {/*    </FormGroup>*/}
-                            {/*</Box>*/}
-                            {/*<Divider/>*/}
+                            <Divider />
                             <Box>
                                 <Typography variant="subtitle1" gutterBottom>課別</Typography>
                                 <FormGroup>
@@ -193,7 +213,7 @@ function CourseDataGrid() {
                                     ))}
                                 </FormGroup>
                             </Box>
-                            <Divider/>
+                            <Divider />
                             <Button
                                 variant="outlined"
                                 color="secondary"
