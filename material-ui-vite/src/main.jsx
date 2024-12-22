@@ -6,13 +6,13 @@ import App from './App';
 import theme from './theme';
 import SignIn from './sign-in/SignIn'
 import SignUp from './sign-up/SignUp'
-import CourseDataGrid   from "./CourseDataGrid";
-import EmptyScheduleTable from "./EmptyScheduleTable";
-import EmptyScheduleGrid from "./EmptyScheduleGrid";
-import DragSelectScheduleWithMenu from "./old/DragSelectScheduleWithMenu";
-import Tableand from "./Tableand";
+// import CourseDataGrid   from "./CourseDataGrid";
+// import EmptyScheduleTable from "./EmptyScheduleTable";
+// import EmptyScheduleGrid from "./EmptyScheduleGrid";
+// import DragSelectScheduleWithMenu from "./old/DragSelectScheduleWithMenu";
+// import Tableand from "./Tableand";
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import  TinyBarChart  from './bar';
+// import  TinyBarChart  from './bar';
 import {Portrait} from "@mui/icons-material";
 import ProtectedRoute from "./ProtectedRoute";
 const rootElement = document.getElementById('root');
@@ -27,7 +27,7 @@ root.render(
                 <Routes>
                     <Route path="/" element={<SignIn/>}/>
                     <Route path="/signup" element={<SignUp/>}/>
-                    <Route path="/c" element={<CourseDataGrid/>}/>
+                    {/*<Route path="/c" element={<CourseDataGrid/>}/>*/}
                     <Route path="/reset-password" element={<ResetPassword/>} />
                     {/*<Route path="/Table" element={<EmptyScheduleTable/>}/>*/}
                     {/*<Route path="/grid" element={<EmptyScheduleGrid/>}/>*/}
