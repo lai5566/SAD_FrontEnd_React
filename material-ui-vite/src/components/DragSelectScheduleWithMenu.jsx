@@ -1,5 +1,5 @@
-// DragSelectScheduleWithMenu.jsx
-import React, {useState, useRef, useEffect} from 'react';
+// src/components/DragSelectScheduleWithMenu.jsx
+import React, { useState, useRef, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -14,25 +14,24 @@ import {
     FormControlLabel,
     Box,
     Typography,
-    IconButton,
-    Tooltip,
     Snackbar,
     Alert,
-    Card,
+    Chip,
+    Stack,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ErrorIcon from '@mui/icons-material/Error';
 import WarningIcon from '@mui/icons-material/Warning';
 import InfoIcon from '@mui/icons-material/Info';
-import DeleteIcon from '@mui/icons-material/Delete';
-import {styled} from '@mui/material/styles';
-import {useCourseData} from '../dataLayer/useCourseData';
+import { styled } from '@mui/material/styles';
+import { useCourseData } from '../dataLayer/useCourseData';
 import checkCourseConflict from "../utils/checkCourseConflict";
 import SelectedCoursesPanel from './SelectedCoursesPanel'; // 引入新的組件
 import SchedulePieChart from './SchedulePieChart'; // 引入餅圖組件
+import CourseDetailModal from './CourseDetailModal'; // 引入詳細資訊模態框組件
 
 function DragSelectScheduleWithMenu() {
-    const {allCourses, selectedCourses, addCourses, removeCourse} = useCourseData();
+    const { allCourses, selectedCourses, addCourses, removeCourse, isLoading, error } = useCourseData();
 
     const [schedule, setSchedule] = useState({});
     const [selectedRange, setSelectedRange] = useState([]);
@@ -48,15 +47,19 @@ function DragSelectScheduleWithMenu() {
     });
 
     const showLocalSnackbar = (message, severity = 'info') => {
-        setSnackbar({open: true, message, severity});
+        setSnackbar({ open: true, message, severity });
     };
 
     const handleSnackbarClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setSnackbar((prev) => ({...prev, open: false}));
+        setSnackbar((prev) => ({ ...prev, open: false }));
     };
+
+    // 狀態管理：模態框開啟與選擇的課程ID
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedCourseId, setSelectedCourseId] = useState(null);
 
     // 根據 selectedCourses 與 allCourses 更新時間表
     useEffect(() => {
@@ -69,7 +72,7 @@ function DragSelectScheduleWithMenu() {
                     const courseWeekday = parseInt(course.weekday, 10) - 1;
                     coursePeriods.forEach((period) => {
                         const key = `${courseWeekday}-${period - 1}`;
-                        updatedSchedule[key] = course.course_class;
+                        updatedSchedule[key] = course.id; // 儲存 course.id 以便於後續查找
                     });
                 }
             });
@@ -80,17 +83,27 @@ function DragSelectScheduleWithMenu() {
     }, [selectedCourses, allCourses]);
 
     // 滑動選擇時段功能
-    const handleMouseDown = (dayIndex, timeIndex) => {
+    const handleMouseDown = (dayIndex, timeIndex, hasCourse) => {
+        if (hasCourse) {
+            // 有課程的格子點擊時打開模態框
+            const key = `${dayIndex}-${timeIndex}`;
+            const courseId = schedule[key];
+            if (courseId) {
+                setSelectedCourseId(courseId);
+                setIsModalOpen(true);
+            }
+            return;
+        }
         isDragging.current = true;
-        startCell.current = {dayIndex, timeIndex};
-        setSelectedRange([{dayIndex, timeIndex}]);
+        startCell.current = { dayIndex, timeIndex };
+        setSelectedRange([{ dayIndex, timeIndex }]);
     };
 
-    const handleMouseMove = (dayIndex, timeIndex) => {
-        if (isDragging.current && startCell.current?.dayIndex === dayIndex) {
+    const handleMouseMove = (dayIndex, timeIndex, hasCourse) => {
+        if (isDragging.current && startCell.current?.dayIndex === dayIndex && !hasCourse) {
             const start = Math.min(startCell.current.timeIndex, timeIndex);
             const end = Math.max(startCell.current.timeIndex, timeIndex);
-            const range = Array.from({length: end - start + 1}, (_, i) => ({
+            const range = Array.from({ length: end - start + 1 }, (_, i) => ({
                 dayIndex,
                 timeIndex: start + i,
             }));
@@ -99,10 +112,10 @@ function DragSelectScheduleWithMenu() {
     };
 
     const handleMouseUp = (event) => {
-        isDragging.current = false;
-        if (Array.isArray(selectedRange) && selectedRange.length > 0) {
+        if (isDragging.current && selectedRange.length > 0) {
             setAnchorEl(event.currentTarget);
         }
+        isDragging.current = false;
     };
 
     // 過濾符合選擇時段的課程
@@ -124,14 +137,14 @@ function DragSelectScheduleWithMenu() {
         height: 200,
     };
 
-    const StyledText = styled('text')(({theme}) => ({
+    const StyledText = styled('text')(({ theme }) => ({
         fill: theme.palette.text.primary,
         textAnchor: 'middle',
         dominantBaseline: 'central',
         fontSize: 20,
     }));
 
-    function PieCenterLabel({children}) {
+    function PieCenterLabel({ children }) {
         // 現在不需要，因為 SchedulePieChart 已處理
         return null;
     }
@@ -143,8 +156,13 @@ function DragSelectScheduleWithMenu() {
             return;
         }
 
+        // 獲取已選課程的完整對象
+        const selectedCoursesFull = selectedCourses
+            .map(sc => allCourses.find(c => c.id === sc.course))
+            .filter(c => c && c.weekday && c.class_period);
+
         // 檢查衝堂
-        const hasConflict = checkCourseConflict(course, selectedCourses);
+        const hasConflict = checkCourseConflict(course, selectedCoursesFull);
         if (hasConflict) {
             // 使用提示訊息
             showLocalSnackbar('衝堂：該課程與已選課程時間重疊，無法加選！', 'warning');
@@ -168,26 +186,40 @@ function DragSelectScheduleWithMenu() {
 
     const renderCell = (dayIndex, timeIndex) => {
         const key = `${dayIndex}-${timeIndex}`;
+        const hasCourse = schedule[key] !== undefined;
         const isSelected = Array.isArray(selectedRange) && selectedRange.some(
             (cell) => cell.dayIndex === dayIndex && cell.timeIndex === timeIndex
         );
-        const cellContent = schedule[key];
+        const cellContent = hasCourse ? allCourses.find(c => c.id === schedule[key]).course_class : '';
+
         return (
             <TableCell
                 key={key}
-                onMouseDown={() => handleMouseDown(dayIndex, timeIndex)}
-                onMouseMove={() => handleMouseMove(dayIndex, timeIndex)}
+                onMouseDown={(e) => handleMouseDown(dayIndex, timeIndex, hasCourse)}
+                onMouseMove={(e) => handleMouseMove(dayIndex, timeIndex, hasCourse)}
                 onMouseUp={handleMouseUp}
                 sx={{
                     textAlign: 'center',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
                     backgroundColor: isSelected ? 'primary.light' : 'background.paper',
-                    cursor: 'pointer',
+                    cursor: hasCourse ? 'pointer' : 'pointer',
                     userSelect: 'none',
                 }}
             >
-                {cellContent || ''}
+                {cellContent ? (
+                    <Typography
+                        variant="body2"
+                        onClick={(e) => {
+                            e.stopPropagation(); // 防止觸發拖動選課
+                            setSelectedCourseId(schedule[key]);
+                            setIsModalOpen(true);
+                        }}
+                        sx={{ cursor: 'pointer' /* , color: 'primary.main' */ }} // 移除了 color 屬性
+                    >
+                        {cellContent}
+                    </Typography>
+                ) : ''}
             </TableCell>
         );
     };
@@ -200,20 +232,20 @@ function DragSelectScheduleWithMenu() {
     const getAlertIcon = (severity) => {
         switch (severity) {
             case 'success':
-                return <CheckIcon fontSize="inherit"/>;
+                return <CheckIcon fontSize="inherit" />;
             case 'error':
-                return <ErrorIcon fontSize="inherit"/>;
+                return <ErrorIcon fontSize="inherit" />;
             case 'warning':
-                return <WarningIcon fontSize="inherit"/>;
+                return <WarningIcon fontSize="inherit" />;
             case 'info':
             default:
-                return <InfoIcon fontSize="inherit"/>;
+                return <InfoIcon fontSize="inherit" />;
         }
     };
 
     return (
-        <Box display="flex" gap="2%" sx={{alignItems: 'flex-start', p: 2}}>
-            <Paper elevation={2} sx={{flex: '75%', height: '100%', p: 2}}>
+        <Box display="flex" gap="2%" sx={{ alignItems: 'flex-start', p: 2 }}>
+            <Paper elevation={2} sx={{ flex: '75%', height: '100%', p: 2 }}>
                 <FormControlLabel
                     control={
                         <Switch
@@ -222,30 +254,30 @@ function DragSelectScheduleWithMenu() {
                         />
                     }
                     label={isFullTable ? '完整表格 (7×14)' : '簡化表格 (5×10)'}
-                    sx={{mb: 2}}
+                    sx={{ mb: 2 }}
                 />
                 <Typography variant="h5" component="div" gutterBottom>
                     時間表
                 </Typography>
-                <TableContainer component={Paper} sx={{maxWidth: 800, mx: 'auto', mt: 2}}>
+                <TableContainer component={Paper} sx={{ maxWidth: 800, mx: 'auto', mt: 2 }}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{fontWeight: 'bold', textAlign: 'center'}}>時段</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>時段</TableCell>
                                 {days.map((day) => (
-                                    <TableCell key={day} sx={{fontWeight: 'bold', textAlign: 'center'}}>
+                                    <TableCell key={day} sx={{ fontWeight: 'bold', textAlign: 'center' }}>
                                         {day}
                                     </TableCell>
                                 ))}
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {Array.from({length: periods}).map((_, timeIndex) => (
+                            {Array.from({ length: periods }).map((_, timeIndex) => (
                                 <TableRow key={timeIndex}>
-                                    <TableCell sx={{textAlign: 'center', fontWeight: 'bold'}}>
+                                    <TableCell sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                                         {`第${timeIndex + 1}節`}
                                     </TableCell>
-                                    {Array.from({length: days.length}).map((_, dayIndex) =>
+                                    {Array.from({ length: days.length }).map((_, dayIndex) =>
                                         renderCell(dayIndex, timeIndex)
                                     )}
                                 </TableRow>
@@ -269,26 +301,35 @@ function DragSelectScheduleWithMenu() {
                 </Menu>
             </Paper>
             <Box sx={{ flex: '16%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {/* 引入已選課程面板 */}
-              <SelectedCoursesPanel />
-              {/* 引入選修學分圖表 */}
-              <SchedulePieChart />
+                {/* 引入已選課程面板 */}
+                <SelectedCoursesPanel />
+                {/* 引入選修學分圖表 */}
+                <SchedulePieChart />
             </Box>
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={1500}
                 onClose={handleSnackbarClose}
-                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 <Alert
                     onClose={handleSnackbarClose}
                     severity={snackbar.severity}
-                    sx={{width: '100%'}}
+                    sx={{ width: '100%' }}
                     icon={getAlertIcon(snackbar.severity)}
                 >
                     {snackbar.message}
                 </Alert>
             </Snackbar>
+
+            {/* CourseDetailModal 組件 */}
+            {selectedCourseId && (
+                <CourseDetailModal
+                    courseId={selectedCourseId}
+                    open={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                />
+            )}
         </Box>
     );
 }
