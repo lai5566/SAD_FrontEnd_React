@@ -6,6 +6,8 @@ import SelectedCoursesPanel from '../components/SelectedCoursesPanel';
 import MuiCard from "@mui/material/Card";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
+import SchedulePieChart from "../components/SchedulePieChart";
+
 const SchedulePageContainer = styled(Stack)(({theme}) => ({
     minHeight: '100%',
     padding: theme.spacing(2),
@@ -45,7 +47,7 @@ const Card = styled(MuiCard)(({theme}) => ({
 function SchedulePage(props) {
     return (
         <AppTheme {...props}>
-             <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+            <ColorModeSelect sx={{position: 'fixed', top: '1rem', right: '1rem'}}/>
             <SchedulePageContainer>
                 <Card>
                     <Box>
@@ -53,6 +55,11 @@ function SchedulePage(props) {
                         <CourseDataGrid/>
                         <DragSelectScheduleWithMenu/>
                         {/*<SelectedCoursesPanel /> {/*<SelectedCoursesPanel />*/}
+                        {/*<SelectedCoursesPanel/>*/}
+                        {/*/!* 引入選修學分圖表 *!/*/}
+                        {/*<SchedulePieChart/>         {/*<SelectedCoursesPanel/>*/}
+                        {/*/!* 引入選修學分圖表 *!/*/}
+                        {/*<SchedulePieChart/>*/}
 
 
                     </Box>

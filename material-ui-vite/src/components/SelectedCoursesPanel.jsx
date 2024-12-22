@@ -64,7 +64,7 @@ function SelectedCoursesPanel() {
   };
 
   return (
-    <Paper sx={{ p: 2, mt: 2 }}>
+    <Paper elevation={2} sx ={{ p: 2, mt: 0 }}>
       <Typography variant="h6" gutterBottom>已選課程</Typography>
       <Toolbar
         sx={{

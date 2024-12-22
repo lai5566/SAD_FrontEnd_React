@@ -9,7 +9,7 @@ import SignUp from './sign-up/SignUp'
 // import CourseDataGrid   from "./CourseDataGrid";
 // import EmptyScheduleTable from "./EmptyScheduleTable";
 // import EmptyScheduleGrid from "./EmptyScheduleGrid";
-// import DragSelectScheduleWithMenu from "./old/DragSelectScheduleWithMenu";
+// import DragSelectScheduleWithMenu from "./deprecated/DragSelectScheduleWithMenu";
 // import Tableand from "./Tableand";
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 // import  TinyBarChart  from './bar';

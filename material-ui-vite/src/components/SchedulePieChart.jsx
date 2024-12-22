@@ -1,13 +1,15 @@
 // SchedulePieChart.jsx
 import React, { useMemo } from 'react';
+import { useTheme } from '@mui/material/styles'; // 引入 useTheme
 import { useCourseData } from '../dataLayer/useCourseData';
 import { PieChart } from '@mui/x-charts/PieChart';
-import { Card, Typography } from '@mui/material';
+import {Card, Paper, Typography} from '@mui/material';
 
 function SchedulePieChart() {
   const { allCourses, selectedCourses } = useCourseData();
+  const theme = useTheme(); // 獲取當前主題
 
-  // 計算學分分佈
+  // 計算學分分佈和總學分
   const { pieData, totalCredits } = useMemo(() => {
     const counts = {
       '通識必修': 0,
@@ -37,13 +39,13 @@ function SchedulePieChart() {
   }, [allCourses, selectedCourses]);
 
   return (
-    <Card sx={{ p: 2, mt: 2 }}>
+    <Paper elevation={2} sx={{ p: 2, mt: 2 }}>
       <Typography variant="h6" gutterBottom>選修學分</Typography>
       <PieChart series={[{ data: pieData, innerRadius: 80 }]} width={400} height={200}>
         <text
-          x="50%"
+          x="39%"
           y="50%"
-          fill="black"
+          fill={theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.text.primary} // 動態設定文字顏色
           textAnchor="middle"
           dominantBaseline="middle"
           fontSize="20"
@@ -51,7 +53,7 @@ function SchedulePieChart() {
           {totalCredits}
         </text>
       </PieChart>
-    </Card>
+    </Paper>
   );
 }
 

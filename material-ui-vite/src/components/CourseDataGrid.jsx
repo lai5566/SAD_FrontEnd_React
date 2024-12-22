@@ -148,7 +148,6 @@ function CourseDataGrid() {
                 </Box>
                 {/* 查詢工具區 */}
                 <Box flex={1}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
                         <Typography variant="h6" gutterBottom>
                             查詢工具
                         </Typography>
@@ -228,7 +227,6 @@ function CourseDataGrid() {
                                 重置篩選
                             </Button>
                         </Box>
-                    </Paper>
                 </Box>
             </Box>
         </Paper>
