@@ -15,7 +15,6 @@ import Stack from '@mui/material/Stack';
 
 export default function App() {
 
-
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,
   height: 34,

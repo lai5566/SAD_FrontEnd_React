@@ -1,3 +1,4 @@
+// src/dataLayer/CourseProvider.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import CourseContext from './CourseContext';
 import { fetchAllCourses, fetchStudentCourses, addStudentCourse, removeStudentCourse } from '../api/coursesApi';
@@ -5,24 +6,36 @@ import { fetchAllCourses, fetchStudentCourses, addStudentCourse, removeStudentCo
 function CourseProvider({ children }) {
   const [allCourses, setAllCourses] = useState([]);
   const [selectedCourses, setSelectedCourses] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // 載入所有課程
   const loadAllCourses = useCallback(async () => {
+    setIsLoading(true);
     try {
       const courses = await fetchAllCourses();
       setAllCourses(courses);
+      setError(null);
     } catch (error) {
       console.error('Failed to fetch all courses:', error);
+      setError('無法載入所有課程資料');
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
   // 載入使用者已選課程
   const loadSelectedCourses = useCallback(async () => {
+    setIsLoading(true);
     try {
       const studentCourses = await fetchStudentCourses();
       setSelectedCourses(studentCourses);
+      setError(null);
     } catch (error) {
       console.error('Failed to fetch student courses:', error);
+      setError('無法載入已選課程資料');
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -31,44 +44,24 @@ function CourseProvider({ children }) {
     loadSelectedCourses();
   }, [loadAllCourses, loadSelectedCourses]);
 
-// src/dataLayer/CourseProvider.jsx
+  const addCourses = async (courses) => {
+    for (const course of courses) {
+      console.log('Adding course:', course); // 檢查 course 對象
 
-// const addCourses = async (courses) => {
-//   for (const course of courses) {
-//     console.log('Adding course:', course); // 添加這行以檢查 course 對象
-//     if (!course.course.id) {
-//       console.error('Course does not have course.id:', course);
-//       continue;
-//     }
-//
-//     try {
-//       const added = await addStudentCourse(course.course.id); // 傳遞 course_id
-//       setSelectedCourses(prev => [...prev, added]);
-//       console.log('Added course successfully:', added);
-//     } catch (error) {
-//       console.error('Failed to add course:', course.course.id, error.response ? error.response.data : error.message);
-//     }
-//   }
-// };
+      if (!course.id) {
+        console.error('Course does not have id:', course);
+        continue;
+      }
 
-const addCourses = async (courses) => {
-  for (const course of courses) {
-    console.log('Adding course:', course); // 檢查 course 對象
-
-    if (!course.id) {
-      console.error('Course does not have id:', course);
-      continue;
+      try {
+        const added = await addStudentCourse(course.id); // 傳遞 course.id
+        setSelectedCourses(prev => [...prev, added]);
+        console.log('Added course successfully:', added);
+      } catch (error) {
+        console.error('Failed to add course:', course.id, error.response ? error.response.data : error.message);
+      }
     }
-
-    try {
-      const added = await addStudentCourse(course.id); // 傳遞 course.id
-      setSelectedCourses(prev => [...prev, added]);
-      console.log('Added course successfully:', added);
-    } catch (error) {
-      console.error('Failed to add course:', course.id, error.response ? error.response.data : error.message);
-    }
-  }
-};
+  };
 
   const removeCourse = async (studentCourseId) => {
     try {
@@ -86,6 +79,8 @@ const addCourses = async (courses) => {
     removeCourse,
     refreshAllCourses: loadAllCourses,
     refreshSelectedCourses: loadSelectedCourses,
+    isLoading,
+    error,
   };
 
   return (
