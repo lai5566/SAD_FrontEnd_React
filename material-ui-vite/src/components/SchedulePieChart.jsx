@@ -1,3 +1,4 @@
+// SchedulePieChart.jsx
 import React, { useMemo } from 'react';
 import { useCourseData } from '../dataLayer/useCourseData';
 import { PieChart } from '@mui/x-charts/PieChart';
