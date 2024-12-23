@@ -19,10 +19,22 @@ import {
     Snackbar,
     Alert,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add'; // 引入 AddIcon
+import AddIcon from '@mui/icons-material/Add';
 import { useCourseData } from '../dataLayer/useCourseData';
-import CourseDetailModal from './CourseDetailModal'; // 引入 CourseDetailModal
-import checkCourseConflict from '../utils/checkCourseConflict'; // 引入 checkCourseConflict
+import CourseDetailModal from './CourseDetailModal';
+import checkCourseConflict from '../utils/checkCourseConflict';
+import CheckIcon from '@mui/icons-material/Check';
+import ErrorIcon from '@mui/icons-material/Error';
+import WarningIcon from '@mui/icons-material/Warning';
+import InfoIcon from '@mui/icons-material/Info';
+
+// 定義 iconMapping
+const iconMapping = {
+    success: <CheckIcon fontSize="inherit" />,
+    error: <ErrorIcon fontSize="inherit" />,
+    warning: <WarningIcon fontSize="inherit" />,
+    info: <InfoIcon fontSize="inherit" />,
+};
 
 // 自定義工具列組件
 const CustomToolbar = ({ selectedCount, onAddCourses }) => {
@@ -76,7 +88,6 @@ function CourseDataGrid() {
     // 在資料載入後檢查資料是否有 id 欄位
     useEffect(() => {
         console.log("All Courses:", allCourses);
-        // 檢查資料結構，在 Console 中查看每筆物件是否有 id 欄位
     }, [allCourses]);
 
     const [selectedIds, setSelectedIds] = useState([]);
@@ -110,7 +121,6 @@ function CourseDataGrid() {
             return matchesInstructor && matchesCourseName && matchesGrade && matchesCourseGroup && matchesCourseType;
         });
         console.log("Filtered Rows:", result);
-        // 在Console查看 Filtered Rows，確認每列有 id 欄位
         return result;
     }, [allCourses, selectedInstructor, selectedCourseName, selectedGrades, selectedCourseGroups, selectedCourseTypes]);
 
@@ -228,23 +238,24 @@ function CourseDataGrid() {
                         查詢工具
                     </Typography>
                     <Box display="flex" flexDirection="column" gap={2}>
+                        {/* 復原 disablePortal */}
                         <Autocomplete
-                            disablePortal
                             options={uniqueInstructors}
                             value={selectedInstructor}
                             onChange={(event, newValue) => setSelectedInstructor(newValue)}
                             renderInput={(params) => <TextField {...params} label="選擇老師" />}
                             sx={{ width: '100%' }}
                             clearOnEscape
+                            disablePortal // 恢復 disablePortal
                         />
                         <Autocomplete
-                            disablePortal
                             options={uniqueCourseNames}
                             value={selectedCourseName}
                             onChange={(event, newValue) => setSelectedCourseName(newValue)}
                             renderInput={(params) => <TextField {...params} label="選擇課程名稱" />}
                             sx={{ width: '100%' }}
                             clearOnEscape
+                            disablePortal // 恢復 disablePortal
                         />
                         <Divider />
                         <Box>
@@ -317,6 +328,7 @@ function CourseDataGrid() {
                     onClose={handleSnackbarClose}
                     severity={snackbar.severity}
                     sx={{ width: '100%' }}
+                    iconMapping={iconMapping} // 使用 iconMapping
                 >
                     {snackbar.message}
                 </Alert>

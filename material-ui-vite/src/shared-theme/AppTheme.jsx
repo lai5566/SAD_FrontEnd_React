@@ -55,6 +55,7 @@
 //
 // export default AppTheme;
 // src/shared-theme/AppTheme.jsx
+// src/shared-theme/AppTheme.jsx
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -65,6 +66,7 @@ import { feedbackCustomizations } from './customizations/feedback';
 import { navigationCustomizations } from './customizations/navigation';
 import { surfacesCustomizations } from './customizations/surfaces';
 import { colorSchemes, typography, shadows, shape } from './themePrimitives';
+
 
 function AppTheme({ children, disableCustomTheme, themeComponents }) {
   const theme = React.useMemo(() => {
@@ -83,7 +85,7 @@ function AppTheme({ children, disableCustomTheme, themeComponents }) {
           components: {
             ...inputsCustomizations,
             ...dataDisplayCustomizations,
-            ...feedbackCustomizations,
+            ...feedbackCustomizations, // 確保 feedbackCustomizations 被應用
             ...navigationCustomizations,
             ...surfacesCustomizations,
             ...themeComponents,
@@ -94,7 +96,6 @@ function AppTheme({ children, disableCustomTheme, themeComponents }) {
   if (disableCustomTheme) {
     return <React.Fragment>{children}</React.Fragment>;
   }
-
   return (
     <ThemeProvider theme={theme} disableTransitionOnChange>
       {children}
