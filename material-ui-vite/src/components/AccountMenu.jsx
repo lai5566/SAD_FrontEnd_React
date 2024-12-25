@@ -1,14 +1,15 @@
 // src/components/AccountMenu.jsx
 
-import React, { useState } from 'react';
-import { IconButton, Menu, MenuItem, Divider, Typography, Box } from '@mui/material';
+import React, {useState} from 'react';
+import {IconButton, Menu, MenuItem, Divider, Typography, Box} from '@mui/material';
 // import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PasswordIcon from '@mui/icons-material/Password';
 import ChangePasswordModal from './ChangePasswordModal'; // 確保此路徑正確
 import PropTypes from 'prop-types';
-
+import Cookies from 'js-cookie';
+import api from '../api/axiosInstance';
 function AccountMenu() {
     // 狀態管理 Menu 開關
     const [anchorEl, setAnchorEl] = useState(null);
@@ -34,12 +35,16 @@ function AccountMenu() {
         setIsChangePasswordOpen(false);
     };
 
-    const handleLogout = () => {
-        // 清除認證資訊，例如清除 localStorage 或 cookies
-        localStorage.removeItem('authToken');
-        // 重定向到登錄頁面
-        window.location.href = '/login';
-    };
+function handleLogout() {
+  api.post('/sc/api/logout/')
+    .then(() => {
+      window.location.href = '/signin';
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
 
     return (
         <>
@@ -52,9 +57,9 @@ function AccountMenu() {
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleAccountClick}
-                sx={{ width: 40, height: 40 }} // 設置為正方形，與 ColorModeSelect 相同大小
+                sx={{width: 40, height: 40}} // 設置為正方形，與 ColorModeSelect 相同大小
             >
-                <AccountCircleOutlinedIcon fontSize="large" />
+                <AccountCircleOutlinedIcon fontSize="large"/>
             </IconButton>
             <Menu
                 id="account-menu"
@@ -88,16 +93,16 @@ function AccountMenu() {
                         },
                     },
                 }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                transformOrigin={{horizontal: 'right', vertical: 'top'}}
+                anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
             >
                 <MenuItem onClick={handleChangePassword}>
-                    <PasswordIcon fontSize="small" sx={{ mr: 1 }} />
+                    <PasswordIcon fontSize="small" sx={{mr: 1}}/>
                     更改密碼
                 </MenuItem>
-                <Divider />
+                <Divider/>
                 <MenuItem onClick={handleLogout}>
-                    <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
+                    <LogoutIcon fontSize="small" sx={{mr: 1}}/>
                     登出
                 </MenuItem>
             </Menu>

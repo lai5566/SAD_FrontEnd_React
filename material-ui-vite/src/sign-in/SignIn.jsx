@@ -109,6 +109,8 @@ const handleSubmit = async (event) => {
             if (user.is_superuser || user.is_admin) {
                 console.log('Redirecting to admin as superuser/admin');
                 window.location.href = 'http://127.0.0.1:8000/admin'; // 超級用戶或管理員重定向到管理頁面
+                // navigate('http://127.0.0.1:8000/admin', { replace: true });
+
             } else {
                 console.log('Redirecting to /table3 as regular user');
                 navigate('/s'); // 普通用戶導向 /table3

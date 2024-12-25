@@ -25,7 +25,7 @@ root.render(
         <ThemeProvider theme={theme}>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<SignIn/>}/>
+                    <Route path="/signin" element={<SignIn/>}/>
                     <Route path="/signup" element={<SignUp/>}/>
                     {/*<Route path="/c" element={<CourseDataGrid/>}/>*/}
                     <Route path="/reset-password" element={<ResetPassword/>} />
@@ -38,7 +38,7 @@ root.render(
                     {/*<Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />*/}
                     {/* 將 /S 路由包入 CourseProvider 中，使 ScheduleTable 及其子組件能取得全域課程資料 */}
                     <Route 
-                        path="/S" 
+                        path="/"
                         element={
                             <ProtectedRoute>
                                 <CourseProvider>

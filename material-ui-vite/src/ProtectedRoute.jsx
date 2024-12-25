@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
     console.log('ProtectedRoute - isAuthenticated:', isAuthenticated); // 調試用
 
     if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/signin" replace />;
     }
 
     return children;
