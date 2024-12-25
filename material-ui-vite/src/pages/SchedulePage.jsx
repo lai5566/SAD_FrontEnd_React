@@ -1,12 +1,17 @@
+// src/pages/SchedulePage.jsx
+
 import React from 'react';
-import {Box, styled, Stack} from '@mui/material';
+import { Box, styled, Stack } from '@mui/material';
 import CourseDataGrid from '../components/CourseDataGrid';
 import DragSelectScheduleWithMenu from '../components/DragSelectScheduleWithMenu';
 import SelectedCoursesPanel from '../components/SelectedCoursesPanel';
 import MuiCard from "@mui/material/Card";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
-const SchedulePageContainer = styled(Stack)(({theme}) => ({
+import SchedulePieChart from "../components/SchedulePieChart";
+import AccountMenu from '../components/AccountMenu'; // 引入 AccountMenu
+
+const SchedulePageContainer = styled(Stack)(({ theme }) => ({
     minHeight: '100%',
     padding: theme.spacing(2),
     [theme.breakpoints.up('sm')]: {
@@ -26,7 +31,7 @@ const SchedulePageContainer = styled(Stack)(({theme}) => ({
     },
 }));
 
-const Card = styled(MuiCard)(({theme}) => ({
+const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     alignSelf: 'center',
@@ -45,23 +50,24 @@ const Card = styled(MuiCard)(({theme}) => ({
 function SchedulePage(props) {
     return (
         <AppTheme {...props}>
-             <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+            {/* 顯示 ColorModeSelect 和 AccountMenu */}
+            <Box sx={{ position: 'fixed', top: '1rem', right: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <ColorModeSelect />
+                <AccountMenu /> {/* 使用 AccountMenu 組件 */}
+            </Box>
             <SchedulePageContainer>
                 <Card>
                     <Box>
-
-                        <CourseDataGrid/>
-                        <DragSelectScheduleWithMenu/>
-                        {/*<SelectedCoursesPanel /> {/*<SelectedCoursesPanel />*/}
-
-
+                        <CourseDataGrid />
+                        <DragSelectScheduleWithMenu />
+                        {/* 根據需要啟用或禁用其他組件 */}
+                        {/* <SelectedCoursesPanel /> */}
+                        {/* <SchedulePieChart /> */}
                     </Box>
                 </Card>
             </SchedulePageContainer>
-
         </AppTheme>
-    )
-        ;
+    );
 }
 
 export default SchedulePage;
