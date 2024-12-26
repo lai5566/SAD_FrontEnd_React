@@ -1,4 +1,3 @@
-// src/dataLayer/useCourseData.jsx
 import { useContext } from 'react';
 import CourseContext from './CourseContext';
 

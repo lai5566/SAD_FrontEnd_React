@@ -1,5 +1,3 @@
-// src/components/ChangePasswordModal.jsx
-
 import React, { useState } from 'react';
 import { Modal, Box, Typography, TextField, Button, IconButton, Snackbar, Alert } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';

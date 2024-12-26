@@ -1,4 +1,3 @@
-// src/components/DragSelectScheduleWithMenu.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Table,

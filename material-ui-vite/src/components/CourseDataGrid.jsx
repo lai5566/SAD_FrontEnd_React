@@ -1,4 +1,3 @@
-// src/components/CourseDataGrid.jsx
 import React, { useState, useMemo, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import {

@@ -1,4 +1,3 @@
-// src/components/CourseDescription.jsx
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';

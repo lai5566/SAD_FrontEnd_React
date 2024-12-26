@@ -1,4 +1,3 @@
-// SchedulePieChart.jsx
 import React, { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles'; // 引入 useTheme
 import { useCourseData } from '../dataLayer/useCourseData';

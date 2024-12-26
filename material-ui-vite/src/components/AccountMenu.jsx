@@ -1,5 +1,3 @@
-// src/components/AccountMenu.jsx
-
 import React, {useState} from 'react';
 import {IconButton, Menu, MenuItem, Divider, Typography, Box} from '@mui/material';
 // import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircle';

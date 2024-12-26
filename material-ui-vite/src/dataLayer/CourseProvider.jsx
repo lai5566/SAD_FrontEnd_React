@@ -1,4 +1,3 @@
-// src/dataLayer/CourseProvider.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import CourseContext from './CourseContext';
 import { fetchAllCourses, fetchStudentCourses, addStudentCourse, removeStudentCourse } from '../api/coursesApi';

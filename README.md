@@ -3,7 +3,7 @@
 以下為專案的目錄和主要檔案說明：
 ```
 das_FrontEnd_React/
-├── App.jsx                    # 主應用組件，設定路由與主界面
+├── App_2.jsx                    # 主應用組件，設定路由與主界面
 ├── Copyright.jsx              # 版權聲明元件
 ├── CourseDataGrid.jsx         # 課程資料表格展示
 ├── EmptyScheduleGrid.jsx      # 空課表的格子顯示
