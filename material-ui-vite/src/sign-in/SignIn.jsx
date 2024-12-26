@@ -113,7 +113,7 @@ const handleSubmit = async (event) => {
 
             } else {
                 console.log('Redirecting to /table3 as regular user');
-                navigate('/s'); // 普通用戶導向 /table3
+                navigate('/'); // 普通用戶導向 /table3
             }
         } else {
             console.error('Login failed:', response.data.message);

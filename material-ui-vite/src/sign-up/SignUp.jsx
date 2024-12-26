@@ -331,7 +331,7 @@ export default function SignUp(props) {
                         <span>
                   <Link
                       component={RouterLink}
-                      to="/"  // 改用 React Router 的 "to" 屬性來指定路徑
+                      to="/signin"  // 改用 React Router 的 "to" 屬性來指定路徑
                       variant="body2"
                       sx={{alignSelf: 'center'}}
                   >
