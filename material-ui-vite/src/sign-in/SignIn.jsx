@@ -1,3 +1,4 @@
+// src/components/SignIn.js
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -39,11 +40,12 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
-    minHeight: '100%',
+    minHeight: '100vh', // 使用 '100vh' 以確保佔滿全螢幕高度
     padding: theme.spacing(2),
     [theme.breakpoints.up('sm')]: {
         padding: theme.spacing(4),
     },
+    position: 'relative', // 修改為相對定位以便 ::before 正常顯示
     '&::before': {
         content: '""',
         display: 'block',
@@ -74,109 +76,107 @@ export default function SignIn(props) {
         setOpen(false);
     };
 
-const handleSubmit = async (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const signInData = {
-        email: data.get('email'),
-        password: data.get('password'),
-    };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        const signInData = {
+            email: data.get('email'),
+            password: data.get('password'),
+        };
 
-    // 驗證輸入
-    if (!validateInputs()) {
-        return;
-    }
+        // 驗證輸入
+        if (!validateInputs()) {
+            return;
+        }
 
-    try {
-        const response = await api.post('/sc/api/auth/login/', signInData, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            withCredentials: true, // 確保跨域帶上 Cookie
-        });
+        try {
+            const response = await api.post('/sc/api/auth/login/', signInData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                withCredentials: true, // 確保跨域帶上 Cookie
+            });
 
-        console.log('Login response:', response.data); // 調試用
+            console.log('Login response:', response.data); // 調試用
 
-        if (response.data.success) {
-            const { user, message } = response.data;
-            console.log('Login success:', message);
-            console.log('User data:', user);
+            if (response.data.success) {
+                const { user, message } = response.data;
+                console.log('Login success:', message);
+                console.log('User data:', user);
 
-            // 設置認證標記
-            localStorage.setItem('isAuthenticated', 'true');
+                // 確認 is_admin 和 is_superuser
+                console.log('User is_admin:', user.is_admin);
+                console.log('User is_superuser:', user.is_superuser);
 
-            // 根據角色進行重定向
-            if (user.is_superuser || user.is_admin) {
-                console.log('Redirecting to admin as superuser/admin');
-                window.location.href = 'http://127.0.0.1:8000/admin'; // 超級用戶或管理員重定向到管理頁面
-                // navigate('http://127.0.0.1:8000/admin', { replace: true });
+                // 設置認證標記和用戶角色到 localStorage
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('is_admin', user.is_admin);
+                localStorage.setItem('is_superuser', user.is_superuser);
+                localStorage.setItem('user_email', user.email); // 可選：存儲更多用戶資訊
 
+                // 根據角色進行重定向
+                if (user.is_superuser || user.is_admin) {
+                    console.log('Redirecting to admin as superuser/admin');
+                    window.location.href = 'http://127.0.0.1:8000/admin'; // 超級用戶或管理員重定向到管理頁面
+                } else {
+                    console.log('Redirecting to / as regular user');
+                    navigate('/', { replace: true }); // 普通用戶導向 /
+                }
             } else {
-                console.log('Redirecting to /table3 as regular user');
-                navigate('/'); // 普通用戶導向 /table3
+                console.error('Login failed:', response.data.message);
+                alert('登入失敗，請檢查帳號密碼。');
             }
-        } else {
-            console.error('Login failed:', response.data.message);
+        } catch (error) {
+            console.error('Login failed:', error.response?.data || error.message);
             alert('登入失敗，請檢查帳號密碼。');
         }
-    } catch (error) {
-        console.error('Login failed:', error.response?.data || error.message);
-        alert('登入失敗，請檢查帳號密碼。');
-    }
-};
+    };
 
-
-    // 设置 Axios 拦截器
-    React.useEffect(() => {
-        // 获取 CSRF Token
-        getCsrfToken();
-
-        // 验证 Token 是否有效
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            api.get('/api/protected/')
-                .then(() => {
-                    console.log('Token is valid.');
-                })
-                .catch(() => {
-                    console.error('Invalid token. Redirecting to login.');
-                    localStorage.clear();
-                    window.location.href = '/';
-                });
-        }
-    }, []);
-
+    // 獲取 CSRF Token
     const getCsrfToken = async () => {
         try {
-            const response = await axios.get('http://127.0.0.1:8000/sc/csrf/', { withCredentials: true }); // 确保携带 Cookie
+            const response = await axios.get('http://127.0.0.1:8000/sc/csrf/', { withCredentials: true }); // 確保攜帶 Cookie
             const csrfToken = response.data.csrfToken;
-            api.defaults.headers.common['X-CSRFToken'] = csrfToken; // 更新 api 实例的默认请求头
+            api.defaults.headers.common['X-CSRFToken'] = csrfToken; // 更新 api 實例的默認請求頭
             console.log('CSRF Token initialized:', csrfToken);
         } catch (error) {
             console.error('Failed to fetch CSRF Token:', error);
         }
     };
 
-    // 設定 Axios 攔截器檢查 Token
-    api.interceptors.request.use((config) => {
-        const csrfToken = Cookies.get('csrftoken'); // 从 Cookie 动态获取 CSRF Token
-        if (csrfToken) {
-            config.headers['X-CSRFToken'] = csrfToken; // 设置请求头
-        }
-        return config;
-    }, (error) => Promise.reject(error));
+    // 在組件加載時獲取 CSRF Token
+    React.useEffect(() => {
+        getCsrfToken();
+    }, []);
 
-    api.interceptors.response.use(
-        (response) => response,
-        async (error) => {
-            if (error.response?.status === 403 && error.response?.data?.detail === 'CSRF Failed') {
-                console.warn('CSRF validation failed. Re-fetching CSRF Token...');
-                await getCsrfToken(); // 重新获取 CSRF Token
-                return Promise.reject(error); // 继续抛出错误
+    // 設定 Axios 攔截器檢查 CSRF Token
+    React.useEffect(() => {
+        const requestInterceptor = api.interceptors.request.use((config) => {
+            const csrfToken = Cookies.get('csrftoken'); // 從 Cookie 獲取 CSRF Token
+            if (csrfToken) {
+                config.headers['X-CSRFToken'] = csrfToken; // 設置請求頭
             }
-            return Promise.reject(error);
-        }
-    );
+            return config;
+        }, (error) => Promise.reject(error));
+
+        const responseInterceptor = api.interceptors.response.use(
+            (response) => response,
+            async (error) => {
+                if (error.response?.status === 403 && error.response?.data?.detail === 'CSRF Failed') {
+                    console.warn('CSRF validation failed. Re-fetching CSRF Token...');
+                    await getCsrfToken(); // 重新獲取 CSRF Token
+                    return Promise.reject(error); // 繼續拋出錯誤
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        // 清除攔截器以避免內存洩漏
+        return () => {
+            api.interceptors.request.eject(requestInterceptor);
+            api.interceptors.response.eject(responseInterceptor);
+        };
+    }, []);
 
     const validateInputs = () => {
         const email = document.getElementById('email');
@@ -285,7 +285,6 @@ const handleSubmit = async (event) => {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            onClick={validateInputs}
                         >
                             登入
                         </Button>
