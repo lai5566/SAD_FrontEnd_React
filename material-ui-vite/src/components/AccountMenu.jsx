@@ -36,7 +36,8 @@ function AccountMenu() {
     };
 
 function handleLogout() {
-  api.post('/sc/api/logout/')
+    localStorage.setItem('isAuthenticated', 'false');
+    api.post('/sc/api/logout/')
     .then(() => {
       window.location.href = '/signin';
     })
